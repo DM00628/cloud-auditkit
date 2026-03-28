@@ -1,0 +1,66 @@
+name: IaC Compliance Gate
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  compliance-gate:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate compliance tracking files
+        run: |
+          python scripts/control_coverage_check.py controls/control-mapping.csv poam/poam-tracker.csv
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive terraform/examples
+
+      - name: Terraform init
+        working-directory: terraform/examples/aws-secure-s3
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        working-directory: terraform/examples/aws-secure-s3
+        run: terraform validate
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: terraform/examples/aws-secure-s3
+          framework: terraform
+          quiet: true
+          soft_fail: false
+
+      - name: Install Conftest
+        run: |
+          wget -qO- https://github.com/open-policy-agent/conftest/releases/download/v0.58.0/conftest_0.58.0_Linux_x86_64.tar.gz | tar xz
+          sudo mv conftest /usr/local/bin/conftest
+
+      - name: Build Terraform plan JSON
+        working-directory: terraform/examples/aws-secure-s3
+        run: |
+          terraform plan -refresh=false -lock=false -input=false -out=tfplan
+          terraform show -json tfplan > tfplan.json
+
+      - name: Run OPA policy checks with Conftest
+        working-directory: terraform/examples/aws-secure-s3
+        run: |
+          conftest test tfplan.json --policy ../../../policies/opa/terraform
