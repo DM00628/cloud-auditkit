@@ -1,0 +1,43 @@
+name: Compliance Check
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  compliance-check:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate CSV structure
+        run: |
+          test -f controls/control-mapping.csv
+          test -f poam/poam-tracker.csv
+
+      - name: Basic control coverage check
+        run: |
+          echo "Checking that required columns exist in control mapping"
+          head -n 1 controls/control-mapping.csv | grep -q "Control ID"
+          head -n 1 controls/control-mapping.csv | grep -q "Implementation Status"
+          head -n 1 controls/control-mapping.csv | grep -q "Evidence Reference"
+
+      - name: Basic POA&M structure check
+        run: |
+          echo "Checking that required columns exist in POA&M tracker"
+          head -n 1 poam/poam-tracker.csv | grep -q "POAM ID"
+          head -n 1 poam/poam-tracker.csv | grep -q "Risk Level"
+          head -n 1 poam/poam-tracker.csv | grep -q "Target Completion Date"
+
+      - name: Placeholder policy checks
+        run: |
+          echo "Add tfsec, Checkov, OPA, or custom scripts here"
+          echo "This starter workflow validates repo structure and can be extended for NIST automation"
