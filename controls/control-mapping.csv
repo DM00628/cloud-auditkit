@@ -1,0 +1,9 @@
+Control ID,Family,Control Name,Requirement Summary,Implementation Status,Artifact Needed,Evidence Reference,Owner,Review Cadence,Notes
+AC-2,Access Control,Account Management,Define and manage system accounts,Planned,Account review records,evidence/access/account-reviews.md,Security Team,Quarterly,Map to IAM and joiner mover leaver workflow
+AC-6,Access Control,Least Privilege,Limit privileges to least necessary,Planned,Role matrix,evidence/access/role-matrix.md,Security Team,Quarterly,Review elevated roles and service accounts
+AU-2,Audit and Accountability,Event Logging,Identify auditable events,Planned,Logging standard,evidence/logging/logging-standard.md,Platform Team,Semi-Annual,Map to cloud audit trails and SIEM
+AU-12,Audit and Accountability,Audit Generation,Generate audit records,Planned,Log retention evidence,evidence/logging/log-retention.md,Platform Team,Semi-Annual,Confirm retention and protection settings
+CM-3,Configuration Management,Configuration Change Control,Control and document changes,Implemented,PR approvals,GitHub pull requests and branch protection,Engineering,Continuous,Use pull requests for all production changes
+CM-6,Configuration Management,Configuration Settings,Establish secure baselines,Planned,Baseline definition,docs/secure-baseline.md,Engineering,Quarterly,Use Terraform modules and policy checks
+RA-5,Risk Assessment,Vulnerability Monitoring,Scan for vulnerabilities and misconfigurations,Planned,Scan reports,evidence/scans/latest-scan-summary.md,Security Team,Monthly,Integrate IaC and image scanning in CI
+CA-7,Assessment Authorization and Monitoring,Continuous Monitoring,Track security posture over time,Planned,Monitoring plan,docs/continuous-monitoring.md,GRC Team,Monthly,Connect control reviews and recurring scans
